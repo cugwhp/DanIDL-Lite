@@ -1,0 +1,25 @@
+The modules in this directory deal with the subject of general image processing. In DanIDL, the term
+"image" is used to refer to any two-dimensional array, and the elements of this array are generally
+referred to as pixels. Some modules further require a minimum size along each image dimension for the
+input image(s).
+
+In DanIDL, I adopt three different definitions for image coordinate systems:
+
+(i) The pixel index coordinate system for images is a discrete coordinate system that defines the
+    bottom left-hand pixel in an image to be at the integer coordinates (0,0). For each pixel moved
+    to the right in the image, the x pixel index increments by 1, and similarly for each pixel moved
+    up in the image, the y pixel index increments by 1. This pixel coordinate system is defined in
+    this manner in order to be consistent with IDL array indices which start at zero.
+
+(ii) The pixel number coordinate system for images is also a discrete coordinate system with the same
+     properties as the pixel index coordinate system, except that it defines the bottom left-hand
+     pixel in an image to be at the integer coordinates (1,1).
+
+(iii) The continuous pixel coordinate system for images is defined such that the origin of the
+      coordinate system is at the bottom left-hand corner of the bottom left-hand pixel in an image.
+      Therefore, the centre of the bottom left-hand pixel in an image has coordinates (0.5,0.5) in
+      this coordinate system. For each full pixel moved to the right in the image, the x pixel
+      coordinate increments by 1, and similarly for each full pixel moved up in the image, the y pixel
+      coordinate increments by 1.
+
+These definitions apply to all DanIDL modules, not just those that are present in this directory.

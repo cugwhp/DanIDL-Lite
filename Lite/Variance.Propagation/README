@@ -1,0 +1,314 @@
+The modules in this directory deal with the subject of variance (and covariance) propagation for random
+variables. In order to help the programmer with the selection of the correct module for any particular
+variance propagation problem, I have listed the available modules along with the situations for which
+they are designed and the conditions under which their calculations are valid.
+
+The modules are designed to deal with the following general classes of problems:
+
+(i) A transformation of a single random variable applied to each of M random variables.
+(ii) M sets of transformations of a single random variable applied to each of M random variables.
+(iii) A transformation of two random variables applied to each of M pairs of random variables.
+(iv) M sets of transformations of two random variables applied to M pairs of random variables.
+(v) A transformation of N random variables applied to one set of N random variables.
+(vi) A transformation of N random variables applied to each of M sets of N random variables.
+(vii) M sets of transformations of N random variables applied to one set of N random variables.
+(viii) M sets of transformations of N random variables applied to M sets of N random variables.
+
+The programmer should check the conditions under which the variance propagation calculations performed
+by a module are valid:
+
+(i) In the best case, the variance propagation calculations performed by a module are valid regardless
+    of the underlying probability density functions (PDFs) of the random variables that are being
+    transformed. However, some calculations may only be valid for certain PDFs. Alternatively, some
+    modules provide options for simpler and/or speedier calculations when the underlying PDF is known.
+
+(ii) The most general modules deal with transformations of multiple random variables with non-zero
+     covariances. However, some modules perform variance propagation calculations that are only valid
+     for random variables with zero covariances (which includes the case of independent random
+     variables). Alternatively, some modules provide options for simpler and/or speedier calculations
+     when the random variables are known to have zero covariances (or are known to be independent).
+     Note that if two random variables are independent, then their covariance is zero, but that the
+     converse of this statement is not true.
+
+The programmer should also be aware of the following:
+
+(i) Some modules perform variance propagation calculations that employ exact analytical expressions,
+    and so the results supplied by these modules may be considered to be exact. However, some modules
+    only employ approximation formulae since exact analytical expressions either do not exist or are
+    highly complicated.
+
+(ii) Some modules also perform propagation of the expected values (or means) of the random variables.
+     However, for a linear transformation/combination of random variables, the expected values undergo
+     the same transformation, and hence I have not implemented expected value propagation in the
+     relevant modules. Similarly, for variance propagation using approximation formulae derived via
+     linearisation by first-order Taylor series expansion, the expected values undergo the same
+     transformation to first order as that applied to the random variables (only second-order correction
+     terms may be non-zero). Therefore again I have not implemented expected value propagation in the
+     corresponding modules.
+
+(iii) Modules that employ approximation formulae for variance propagation, as derived by linearisation
+      by first-order Taylor series expansion, may be used in serial to obtain the same approximation
+      result as if the linearisation method were applied directly to the full compound transformation
+      of the random variable(s) (including when the covariances of the random variables are non-zero).
+
+      For example:
+      Consider the transformation:
+        X = 1/A^2
+      Then, to first order we have:
+        Var(X) = 4*Var(A)/(E(A)^6)
+      However, we may also write the transformation as:
+        Y = A^2
+        X = 1/Y
+      Then, to first order we have:
+        Var(Y) = 4*(E(A)^2)*Var(A)
+        Var(X) = Var(Y)/(E(Y)^4)
+      Which reduces to:
+        Var(X) = 4*Var(A)/(E(A)^6)
+      Therefore, we may use the following two variance propagation modules, in either order, to
+      propagate the variance to first order for the transformation X = 1/A^2:
+        propagate_variance_for_square_of_rv.pro
+        propagate_variance_for_inverse_of_rv.pro
+
+      Clearly, variance propagation modules that employ exact formulae may also be used in serial in
+      the same way to obtain an exact variance propagation result for a compound transformation of
+      random variable(s).
+
+      However, using an approximate variance propagation module in serial with an exact variance
+      propagation module will neither yield an exact result, nor a first order approximation result,
+      for the variance propagation of the compound transformation (unless the exact variance
+      propagation module deals specifically with a linear transformation of the random variable(s)).
+      Instead, the compounded variance propagation result will be approximate to an ill-defined order
+      somewhat better than first order. Furthermore, the result may depend on the order in which the
+      modules are employed. Hence care should be taken with interpreting the results when the variance
+      propagation modules are used in this fashion.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_linear_combination_pairs.pro
+
+- M sets of transformations of two random variables applied to M pairs of random variables:
+  X = fa*A + fb*B
+- Valid for any PDF.
+- Variance propagation is exact.
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_general_linear_transformation.pro
+
+- M sets of transformations of N random variables applied to one set of N random variables:
+         N
+  Y_i = Sum a_ij*X_j
+        j=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_sum_of_rvs.pro
+
+- A transformation of N random variables applied to one set of N random variables:
+       N
+  Y = Sum s_i*X_i         s_i = 1 or -1
+      i=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_multiple_sums_of_independent_rvs.pro
+
+- A transformation of N random variables applied to each of M sets of N random variables:
+         N
+  Y_j = Sum s_i*X_ij      s_i = 1 or -1
+        i=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Only applies to independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_multiple_sums_of_rvs.pro
+
+- A transformation of N random variables applied to each of M sets of N random variables:
+         N
+  Y_j = Sum s_i*X_ij      s_i = 1 or -1
+        i=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Valid for random variables with non-zero covariances.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_product_pairs.pro
+
+- A transformation of two random variables applied to each of M pairs of random variables:
+  X = A*B
+- Valid for any PDF.
+- Options available for random variables with bivariate normal PDFs.
+- Variance propagation is exact.
+- Valid for random variables with non-zero covariances. 
+- Options available for independent random variables.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_product_of_independent_rvs.pro
+
+- A transformation of N random variables applied to one set of N random variables:
+        N
+  Y = Prod X_i
+       i=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Only applies to independent random variables.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_product_of_rvs.pro
+
+- A transformation of N random variables applied to one set of N random variables:
+        N
+  Y = Prod X_i
+       i=1
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_multiple_products_of_independent_rvs.pro
+
+- A transformation of N random variables applied to each of M sets of N random variables:
+          N
+  Y_j = Prod X_ij
+         i=1
+- Valid for any PDF.
+- Variance propagation is exact.
+- Only applies to independent random variables.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_multiple_products_of_rvs.pro
+
+- A transformation of N random variables applied to each of M sets of N random variables:
+          N
+  Y_j = Prod X_ij
+         i=1
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Valid for random variables with non-zero covariances.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_ratio_pairs.pro
+
+- A transformation of two random variables applied to each of M pairs of random variables:
+  X = A/B
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_power_pairs.pro
+
+- A transformation of two random variables applied to each of M pairs of random variables:
+  X = A^B
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Valid for random variables with non-zero covariances.
+- Options available for independent random variables.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_inverse_of_rv.pro
+
+- A transformation of a single random variable applied to each of M random variables:
+  X = 1/A
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_square_of_rv.pro
+
+- A transformation of a single random variable applied to each of M random variables:
+  X = A^2
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Options available for random variables with normal PDFs, where the variance propagation is then exact.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_square_root_of_rv.pro
+
+- A transformation of a single random variable applied to each of M random variables:
+  X = A^(1/2)
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_powers_of_rv.pro
+
+- M sets of transformations of a single random variable applied to each of M random variables:
+  X = A^p
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_absolute_value_of_rv.pro
+
+- A transformation of a single random variable applied to each of M random variables:
+  X = |A|
+- Only applies to random variables with normal PDFs.
+- Variance propagation is exact.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_exponentiations_of_rv.pro
+
+- M sets of transformations of a single random variable applied to each of M random variables:
+  X = p^A
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Options available for random variables with normal PDFs, where the variance propagation is then exact.
+- Also performs propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_logarithms_of_rv.pro
+
+- M sets of transformations of a single random variable applied to each of M random variables:
+  X = log_p(A)
+- Valid for any PDF.
+- Variance propagation is approximate (linearisation by first-order Taylor series expansion).
+- Options available for random variables with log-normal PDFs, where the variance propagation is then exact.
+- Also performs propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------
+
+propagate_variance_for_sqrt_of_sum_of_squares_of_iidzmnrvs.pro
+
+- A transformation of N random variables applied to one set of N random variables:
+      [  N        ]^(1/2)
+  Y = [ Sum X_i^2 ]
+      [ i=1       ]
+- Only applies to independent identically distributed zero-mean normal random variables.
+- Variance propagation is exact.
+- Also performs (exact) propagation of the expected values.
+
+------------------------------------------------------------------------------------------------------

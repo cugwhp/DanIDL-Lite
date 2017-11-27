@@ -1,0 +1,47 @@
+Variance/Error And Bad Pixel/Data Mask Propagation:
+---------------------------------------------------
+
+Some DanIDL programs also have a second associated program with the same name but ending in "_werr.pro".
+The two programs process the principal input data in exactly the same way. However, the program with the
+name ending in "_werr.pro" also processes any uncertainty and/or mask data provided with the principal
+input data. Uncertainty data consists of associated variances/covariances or standard errors. Mask data
+consists of integer values distinguishing between good and bad data values or codifying data quality
+information.
+
+The programs have been split into two versions for reasons of simplicity and efficiency. Some programmers
+are not interested in uncertainty or mask propagation, and the programs without the "_werr.pro" name
+extension provide a less complicated interface, and perform less calculations, than the associated
+"_werr.pro" programs. However, for those programmers that do need to propagate uncertainty and/or mask
+information with the processing of the principal data, the "_werr.pro" version of the programs provides
+a convenient way to do this with a single program call (as opposed to potentially three separate program
+calls). Note that each "_werr.pro" program provides what has been deemed to be the most useful way to
+propagate uncertainties and/or masks. However, the chosen methods may not be suitable for the required
+application and they should be checked carefully (e.g. variance propagation taking into account
+covariances is required, whereas the program ignores covariances; bit pattern bad pixel mask propagation
+is required, whereas the program only implements binary bad pixel mask propagation).
+
+DanIDL programs require variance and covariance data to be FLOAT/DOUBLE type numbers, and mask data to
+be BYTE/INTEGER/LONG type numbers. Furthermore, variance data are required to be non-negative numbers.
+DanIDL programs deal with both bit pattern and binary mask data. Bit pattern mask data should only
+consist of non-negative numbers. For binary mask data, DanIDL considers the mask value "1" to represent
+"good" data, and any other mask value to represent "bad" data. Generally, DanIDL programs with the
+"_werr.pro" name extension propagate binary mask data. Specifically, binary mask data are propagated
+such that an output mask value is set to "1" (good) if and only if all of the input data values used
+to calculate the corresponding output data value have mask values that are "1". Otherwise, the output
+mask values are set to "0" (bad). Alternatively, bit pattern mask data are propagated such that an
+output mask value is the bit pattern resulting from the bitwise-OR combination of the mask values for
+the input data used in the calculation of the corresponding output data value.
+
+The implementation philosophy in the DanIDL modules is to propagate the mask data alongside the
+processing of the principal input data, but not to use the mask data to exclude/ignore principal input
+data (and the associated variances) during the processing unless explicitly instructed to do so. This
+is because there are various ways to "ignore" bad data. For example, when calculating the total of N
+data values, it is sufficient to set bad data values to "0.0" and continue to perform the whole sum
+in order to ignore them. However, when calculating the median of N data values, the bad data values
+must be fully excluded from the median calculation for the correct answer to be reached. Furthermore,
+bit pattern mask data must be interpreted as to which bits flag bad data values. Hence, the coding
+required to actually ignore bad data values when using DanIDL modules is typically left to the
+programmer. In the cases where a DanIDL module explicitly ignores bad input data using the mask data,
+an output mask value is set to "1" (good) if and only if at least one of the input data values used
+to calculate the corresponding output data value has a mask value that is "1". Otherwise, the output
+mask values are set to "0" (bad).

@@ -1,0 +1,29 @@
+The modules in this directory deal with the subject of general data cube processing. In DanIDL, the
+term "data cube" is used to refer to any three-dimensional array, and the elements of this array are
+generally referred to as pixels. Some modules further require a minimum size along each data cube
+dimension for the input data cube(s).
+
+In DanIDL, I adopt three different definitions for data cube coordinate systems:
+
+(i) The pixel index coordinate system for data cubes is a discrete coordinate system that defines the
+    bottom left-hand pixel in the first slice of a data cube to be at the integer coordinates (0,0,0).
+    For each pixel moved along the positive x-axis in the data cube, the x pixel index increments by
+    1. Similarly, for each pixel moved along the positive y-axis in the data cube, the y pixel index
+    increments by 1. Finally, for each pixel moved along the positive z-axis in the data cube, the z
+    pixel index increments by 1. This pixel coordinate system is defined in this manner in order to
+    be consistent with IDL array indices which start at zero.
+
+(ii) The pixel number coordinate system for data cubes is also a discrete coordinate system with the
+     same properties as the pixel index coordinate system, except that it defines the bottom left-hand
+     pixel in the first slice of a data cube to be at the integer coordinates (1,1,1).
+
+(iii) The continuous pixel coordinate system for data cubes is defined as a right-handed coordinate
+      system such that the x-, y- and z-axes are parallel with the edges of the data cube, the origin
+      of the coordinate system is located on the outer corner of an appropriate corner pixel of the
+      data cube, and the centre of the corner pixel touching the origin has coordinates (0.5,0.5,0.5).
+      For each full pixel moved along the positive x-axis in the data cube, the x pixel coordinate
+      increments by 1. Similarly, for each full pixel moved along the positive y-axis in the data
+      cube, the y pixel coordinate increments by 1. Finally, for each full pixel moved along the
+      positive z-axis in the data cube, the z pixel coordinate increments by 1.
+
+These definitions apply to all DanIDL modules, not just those that are present in this directory.
